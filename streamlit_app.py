@@ -4,6 +4,7 @@
 # Import python packages
 import streamlit as st
 from snowflake.snowpark.functions import col
+import requests
 
 # Write the app title & header text
 st.title(":cup_with_straw: Customize Your Smoothie :cup_with_straw:")
@@ -24,6 +25,7 @@ ingredients_list = st.multiselect(
     ,max_selections=5
 )
 
+
 # Verify we've got ingredients to proceed with
 if ingredients_list:
     # Render a submit button, and if pressed & we have ingredients, submit to the DB
@@ -34,6 +36,10 @@ if ingredients_list:
         ingredients_string = ''
         for fruit in ingredients_list:
             ingredients_string += fruit + ' '
+            # Get fruityvice data
+            st.subheader(fruit + ' Nutrition Information')
+            fruityvice_response = requests.get("https://www.fruityvice.com/api/fruit/" + fruit)
+            fv_df = st.dataframe(data=fruityvice_response.json(), use_container_width=True)
 
         if ingredients_string:
             # Create an insert statement for the Smoothie order. 
